@@ -1,0 +1,3 @@
+[submodule "ScriptSDK"]
+	path = ScriptSDK
+	url = https://github.com/simarsenault/ScriptSDK.git
