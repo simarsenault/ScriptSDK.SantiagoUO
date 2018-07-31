@@ -1,4 +1,5 @@
-﻿using StealthAPI;
+﻿using ScriptSDK.Engines;
+using StealthAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,9 @@ namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
     {
         static void Main(string[] args)
         {
-            
+            TileReader.Initialize();
+
+            new RaillessLumberjacking().Start();
         }
     }
 }
