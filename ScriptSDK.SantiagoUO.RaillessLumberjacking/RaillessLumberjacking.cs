@@ -56,6 +56,9 @@ namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
                 if (StealthAPI.Stealth.Client.InJournalBetweenTimes("There is nothing here to chop", dateTime, DateTime.Now) >= 0)
                     return ChopTreeResult.DONE;
 
+                if (StealthAPI.Stealth.Client.InJournalBetweenTimes("It appears immune to your blow", dateTime, DateTime.Now) >= 0)
+                    return ChopTreeResult.DONE;
+
                 Thread.Sleep(50);
             }
 
