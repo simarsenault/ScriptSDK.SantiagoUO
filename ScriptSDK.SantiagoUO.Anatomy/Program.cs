@@ -19,7 +19,7 @@ namespace ScriptSDK.SantiagoUO.Anatomy
 
             while (StealthAPI.Stealth.Client.GetSkillValue(Skill.Anatomy) < MAXIMUM_SKILL_VALUE)
             {
-                var human = ItemFinder.Find<Mobile>(EasyUOItem.HUMANS, 2).Find(_human => _human.Serial.Value != PlayerMobile.GetPlayer().Serial.Value);
+                var human = ItemFinder.Find<Mobile>(EasyUOItem.MOBILE_HUMANS, 2).Find(_human => _human.Serial.Value != PlayerMobile.GetPlayer().Serial.Value);
                 if (human == null)
                 {
                     StealthAPI.Stealth.Client.Wait(1000);

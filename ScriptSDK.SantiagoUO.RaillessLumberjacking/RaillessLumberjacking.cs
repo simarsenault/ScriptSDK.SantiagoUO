@@ -38,7 +38,7 @@ namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
         private ChopTreeResult ChopTree(Item hatchet, StealthAPI.StaticItemRealXY tile)
         {
             hatchet.DoubleClick();
-            TargetHelper.GetTarget().WaitForTarget(10000);
+            TargetHelper.GetTarget().WaitForTarget(5000);
 
             DateTime dateTime = DateTime.Now;
             DateTime maxDateTime = dateTime.AddMilliseconds(LUMBERJACKING_HIT_TIMEOUT);

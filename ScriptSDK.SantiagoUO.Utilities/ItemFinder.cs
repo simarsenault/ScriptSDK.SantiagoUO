@@ -8,6 +8,8 @@ namespace ScriptSDK.SantiagoUO.Utilities
 {
     public static class ItemFinder
     {
+        private static readonly uint NO_CONTAINER = uint.MaxValue;
+
         public static List<T> Find<T>(string[] easyUOObjectTypes, uint distance) where T : UOEntity
         {
             var items = new List<T>();
@@ -24,7 +26,7 @@ namespace ScriptSDK.SantiagoUO.Utilities
         {
             StealthAPI.Stealth.Client.SetFindDistance(distance);
 
-            return FindInContainer<T>(EasyUOHelper.ConvertToStealthType(easyUOObjectType), uint.MaxValue);
+            return FindInContainer<T>(EasyUOHelper.ConvertToStealthType(easyUOObjectType), NO_CONTAINER);
         }
 
         public static List<T> FindInBackpackOrPaperdoll<T>(string[] easyUOObjectTypes) where T : UOEntity
@@ -77,7 +79,7 @@ namespace ScriptSDK.SantiagoUO.Utilities
 
         public static List<T> FindInContainer<T>(ushort stealthObjectType, Serial containerSerial) where T : UOEntity
         {
-            return FindInContainer<T>(stealthObjectType, containerSerial == null ? uint.MaxValue : containerSerial.Value);
+            return FindInContainer<T>(stealthObjectType, containerSerial == null ? NO_CONTAINER : containerSerial.Value);
         }
 
         public static List<T> FindInContainer<T>(ushort stealthObjectType, uint container) where T : UOEntity
