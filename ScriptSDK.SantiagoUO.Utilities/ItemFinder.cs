@@ -1,4 +1,5 @@
-﻿using ScriptSDK.Items;
+﻿using ScriptSDK.Engines;
+using ScriptSDK.Items;
 using ScriptSDK.Mobiles;
 using System;
 using System.Collections.Generic;
@@ -7,36 +8,64 @@ namespace ScriptSDK.SantiagoUO.Utilities
 {
     public static class ItemFinder
     {
-        public static List<T> FindInBackpackOrPaperdoll<T>(ushort objectType) where T : UOEntity
+        public static List<T> FindInBackpackOrPaperdoll<T>(string[] easyUOObjectTypes) where T : UOEntity
         {
-            List<Serial> serials = new List<Serial>();
-            serials.Add(PlayerMobile.GetPlayer().Serial);
-            serials.Add(PlayerMobile.GetPlayer().Backpack.Serial);
+            List<Serial> containersSerials = new List<Serial>();
+            containersSerials.Add(PlayerMobile.GetPlayer().Serial);
+            containersSerials.Add(PlayerMobile.GetPlayer().Backpack.Serial);
 
-            return FindInContainers<T>(objectType, serials);
+            return FindInContainers<T>(easyUOObjectTypes, containersSerials);
         }
 
-        public static List<T> FindInContainers<T>(ushort objectType, List<Serial> containersSerials) where T : UOEntity
+        public static List<T> FindInContainer<T>(string[] easyUOObjectTypes, Serial containerSerial) where T : UOEntity
+        {
+            List<Serial> containersSerials = new List<Serial>();
+            containersSerials.Add(containerSerial);
+
+            return FindInContainers<T>(easyUOObjectTypes, containersSerials);
+        }
+
+        public static List<T> FindInContainer<T>(string easyUOObjectType, Serial containerSerial) where T : UOEntity
+        {
+            return FindInContainer<T>(EasyUOHelper.ConvertToStealthType(easyUOObjectType), containerSerial);
+        }
+
+        public static List<T> FindInContainers<T>(string[] easyUOObjectTypes, List<Serial> containersSerials) where T : UOEntity
+        {
+            var items = new List<T>();
+
+            foreach (var easyUOObjectType in easyUOObjectTypes) // TODO: remove duplicate objectType, if any
+            {
+                items.AddRange(FindInContainers<T>(EasyUOHelper.ConvertToStealthType(easyUOObjectType), containersSerials));
+            }
+
+            return items;
+        }
+
+        public static List<T> FindInContainers<T>(ushort stealthObjectType, List<Serial> containersSerials) where T : UOEntity
         {
             if (containersSerials == null)
                 containersSerials = new List<Serial>();
 
-            List<uint> containersIds = new List<uint>();
-            foreach (Serial containerSerial in containersSerials)
+            var items = new List<T>();
+            foreach (var containerSerial in containersSerials) // TODO: remove duplicate container, if any
             {
-                containersIds.Add(containerSerial.Value);
+                items.AddRange(FindInContainer<T>(stealthObjectType, containerSerial));
             }
 
-            var items = new List<T>();
-            foreach (uint containerId in containersIds)
-            {
-                if (StealthAPI.Stealth.Client.FindType(objectType, containerId) < 1)
-                    continue;
+            return items;
+        }
 
-                foreach (var foundItemId in StealthAPI.Stealth.Client.GetFindList())
-                {
-                    items.Add(Activator.CreateInstance(typeof(T), new Serial(foundItemId)) as T);
-                }
+        public static List<T> FindInContainer<T>(ushort stealthObjectType, Serial containerSerial) where T : UOEntity
+        {
+            var items = new List<T>();
+            
+            if (StealthAPI.Stealth.Client.FindType(stealthObjectType, containerSerial.Value) < 1)
+                return items;
+
+            foreach (var foundItemId in StealthAPI.Stealth.Client.GetFindList())
+            {
+                items.Add(Activator.CreateInstance(typeof(T), new Serial(foundItemId)) as T);
             }
 
             return items;

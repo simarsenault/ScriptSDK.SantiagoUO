@@ -13,7 +13,7 @@ namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
     public class RaillessLumberjacking
     {
         private static readonly int TILE_SCAN_DISTANCE = 75;
-        private static readonly int LUMBERJACKING_HIT_TIMEOUT = 8000;
+        private static readonly int LUMBERJACKING_HIT_TIMEOUT = 10000;
 
         public void Start()
         {
@@ -26,7 +26,7 @@ namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
 
                 MovingHelper.GetMovingHelper().newMoveXY(nearestTreeTile.X, nearestTreeTile.Y, true, 1, true);
                 
-                var hatchet = ItemFinder.FindInBackpackOrPaperdoll<Item>(EasyUOHelper.ConvertToStealthType(EasyUOItem.HATCHET));
+                var hatchet = ItemFinder.FindInBackpackOrPaperdoll<Item>(EasyUOItem.HATCHETS);
                 if (hatchet.Count == 0)
                     return;
 
