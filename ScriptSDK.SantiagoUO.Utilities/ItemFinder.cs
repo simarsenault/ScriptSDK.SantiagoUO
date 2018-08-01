@@ -8,6 +8,25 @@ namespace ScriptSDK.SantiagoUO.Utilities
 {
     public static class ItemFinder
     {
+        public static List<T> Find<T>(string[] easyUOObjectTypes, uint distance) where T : UOEntity
+        {
+            var items = new List<T>();
+
+            foreach (var easyUOObjectType in easyUOObjectTypes) // TODO: remove duplicate objectType, if any
+            {
+                items.AddRange(Find<T>(easyUOObjectType, distance));
+            }
+
+            return items;
+        }
+
+        public static List<T> Find<T>(string easyUOObjectType, uint distance) where T : UOEntity
+        {
+            StealthAPI.Stealth.Client.SetFindDistance(distance);
+
+            return FindInContainer<T>(EasyUOHelper.ConvertToStealthType(easyUOObjectType), uint.MaxValue);
+        }
+
         public static List<T> FindInBackpackOrPaperdoll<T>(string[] easyUOObjectTypes) where T : UOEntity
         {
             List<Serial> containersSerials = new List<Serial>();
@@ -58,9 +77,14 @@ namespace ScriptSDK.SantiagoUO.Utilities
 
         public static List<T> FindInContainer<T>(ushort stealthObjectType, Serial containerSerial) where T : UOEntity
         {
+            return FindInContainer<T>(stealthObjectType, containerSerial == null ? uint.MaxValue : containerSerial.Value);
+        }
+
+        public static List<T> FindInContainer<T>(ushort stealthObjectType, uint container) where T : UOEntity
+        {
             var items = new List<T>();
-            
-            if (StealthAPI.Stealth.Client.FindType(stealthObjectType, containerSerial.Value) < 1)
+
+            if (StealthAPI.Stealth.Client.FindType(stealthObjectType, container) < 1)
                 return items;
 
             foreach (var foundItemId in StealthAPI.Stealth.Client.GetFindList())
