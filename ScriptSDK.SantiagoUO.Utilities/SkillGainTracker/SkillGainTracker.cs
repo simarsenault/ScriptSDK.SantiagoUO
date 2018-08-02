@@ -1,11 +1,7 @@
 ﻿using ScriptSDK.Mobiles;
 using StealthAPI;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ScriptSDK.SantiagoUO.Utilities.SkillGainTracker
 {
@@ -66,8 +62,12 @@ namespace ScriptSDK.SantiagoUO.Utilities.SkillGainTracker
 
                         this.skills.Remove(skillValueEntry.Key);
                         this.skills.Add(skillValueEntry.Key, newSkillValue);
+
+                        break;
                     }
                 }
+
+                Thread.Sleep(1000);
             }
         }
     }
