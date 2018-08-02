@@ -26,7 +26,7 @@ namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
 
                 MovingHelper.GetMovingHelper().newMoveXY(nearestTreeTile.X, nearestTreeTile.Y, true, 1, true);
                 
-                var hatchet = ItemFinder.FindInBackpackOrPaperdoll<Item>(EasyUOItem.HATCHETS);
+                var hatchet = ObjetsFinder.FindInBackpackOrPaperdoll<Item>(EasyUOItem.HATCHETS);
                 if (hatchet.Count == 0)
                     return;
 

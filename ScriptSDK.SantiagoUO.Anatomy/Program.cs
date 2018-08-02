@@ -1,10 +1,7 @@
-﻿using ScriptSDK.Engines;
-using ScriptSDK.Items;
-using ScriptSDK.Mobiles;
+﻿using ScriptSDK.Mobiles;
 using ScriptSDK.SantiagoUO.Utilities;
+using ScriptSDK.SantiagoUO.Utilities.SkillGainTracker;
 using StealthAPI;
-using System;
-using System.Threading;
 
 namespace ScriptSDK.SantiagoUO.Anatomy
 {
@@ -14,12 +11,12 @@ namespace ScriptSDK.SantiagoUO.Anatomy
 
         static void Main(string[] args)
         {
-            ConsoleSkillGainTracker consoleSkillGainTracker = new ConsoleSkillGainTracker(Skill.Anatomy);
-            consoleSkillGainTracker.Start();
+            SkillGainTracker skillGainTracker = new SkillGainTracker(Skill.Anatomy, new DiscordSkillChangeEventHandler());
+            skillGainTracker.Start();
 
             while (StealthAPI.Stealth.Client.GetSkillValue(Skill.Anatomy) < MAXIMUM_SKILL_VALUE)
             {
-                var human = ItemFinder.Find<Mobile>(EasyUOItem.MOBILE_HUMANS, 2).Find(_human => _human.Serial.Value != PlayerMobile.GetPlayer().Serial.Value);
+                var human = ObjetsFinder.Find<Mobile>(EasyUOItem.MOBILE_HUMANS, 2).Find(_human => _human.Serial.Value != PlayerMobile.GetPlayer().Serial.Value);
                 if (human == null)
                 {
                     StealthAPI.Stealth.Client.Wait(1000);
@@ -33,7 +30,7 @@ namespace ScriptSDK.SantiagoUO.Anatomy
                 StealthAPI.Stealth.Client.Wait(4000);
             }
 
-            consoleSkillGainTracker.Stop();
+            skillGainTracker.Stop();
         }
     }
 }

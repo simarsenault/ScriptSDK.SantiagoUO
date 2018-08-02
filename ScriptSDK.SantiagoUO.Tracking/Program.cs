@@ -1,6 +1,5 @@
-﻿using ScriptSDK.SantiagoUO.Utilities;
+﻿using ScriptSDK.SantiagoUO.Utilities.SkillGainTracker;
 using StealthAPI;
-using System;
 using System.Threading;
 
 namespace ScriptSDK.SantiagoUO.Tracking
@@ -11,7 +10,7 @@ namespace ScriptSDK.SantiagoUO.Tracking
 
         static void Main(string[] args)
         {
-            ConsoleSkillGainTracker consoleSkillGainTracker = new ConsoleSkillGainTracker(Skill.Tracking);
+            SkillGainTracker consoleSkillGainTracker = new SkillGainTracker(Skill.Tracking, new DiscordSkillChangeEventHandler());
             consoleSkillGainTracker.Start();
 
             while (StealthAPI.Stealth.Client.GetSkillValue(Skill.Tracking) < MAXIMUM_SKILL_VALUE)

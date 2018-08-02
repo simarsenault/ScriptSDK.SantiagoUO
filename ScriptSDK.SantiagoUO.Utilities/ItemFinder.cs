@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ScriptSDK.SantiagoUO.Utilities
 {
-    public static class ItemFinder
+    public static class ObjetsFinder
     {
         private static readonly uint NO_CONTAINER = uint.MaxValue;
 
