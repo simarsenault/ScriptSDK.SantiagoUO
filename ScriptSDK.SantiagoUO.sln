@@ -52,6 +52,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptSDK.SantiagoUO.Evalua
 		{83AB3ECB-8574-4585-86A9-473CD6BA6C75} = {83AB3ECB-8574-4585-86A9-473CD6BA6C75}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptSDK.SantiagoUO.ArmsLore", "ScriptSDK.SantiagoUO.ArmsLore\ScriptSDK.SantiagoUO.ArmsLore.csproj", "{C0690AA3-E330-4813-A799-9AD31E5BD0C0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1809DE0B-5DAC-4F89-A5A3-601912B9EAB1} = {1809DE0B-5DAC-4F89-A5A3-601912B9EAB1}
+		{83AB3ECB-8574-4585-86A9-473CD6BA6C75} = {83AB3ECB-8574-4585-86A9-473CD6BA6C75}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +100,10 @@ Global
 		{FBC01F2C-8DAA-4A50-B49D-2C7C1BF8E91B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBC01F2C-8DAA-4A50-B49D-2C7C1BF8E91B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBC01F2C-8DAA-4A50-B49D-2C7C1BF8E91B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0690AA3-E330-4813-A799-9AD31E5BD0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0690AA3-E330-4813-A799-9AD31E5BD0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0690AA3-E330-4813-A799-9AD31E5BD0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0690AA3-E330-4813-A799-9AD31E5BD0C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
