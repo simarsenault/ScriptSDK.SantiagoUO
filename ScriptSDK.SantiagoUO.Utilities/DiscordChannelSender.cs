@@ -20,6 +20,9 @@ namespace ScriptSDK.SantiagoUO.Utilities
 
         public static void SendMessage(string message)
         {
+            if (instance.channelId == null || instance.channelId.Equals(string.Empty))
+                return; 
+
             var postData = new Dictionary<string, string>
             {
                { "content", message }
