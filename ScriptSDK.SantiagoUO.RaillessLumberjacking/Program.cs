@@ -1,10 +1,6 @@
 ﻿using ScriptSDK.Engines;
+using ScriptSDK.SantiagoUO.Utilities.SkillGainTracker;
 using StealthAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
 {
@@ -12,9 +8,14 @@ namespace ScriptSDK.SantiagoUO.RaillessLumberjacking
     {
         static void Main(string[] args)
         {
+            SkillGainTracker skillGainTracker = new SkillGainTracker(Skill.Lumberjacking, new DiscordSkillChangeEventHandler());
+            skillGainTracker.Start();
+
             TileReader.Initialize();
 
             new RaillessLumberjacking().Start();
+
+            skillGainTracker.Stop();
         }
     }
 }

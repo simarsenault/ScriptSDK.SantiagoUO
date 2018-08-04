@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ScriptSDK.SantiagoUO.Utilities
 {
@@ -13,9 +9,32 @@ namespace ScriptSDK.SantiagoUO.Utilities
             var subKey = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(key, false);
 
             if (subKey != null)
-                return subKey.GetValue(value).ToString();
+            {
+                var subKeyValue = subKey.GetValue(value);
 
-            return string.Empty;
+                if (subKeyValue != null)
+                    return subKey.GetValue(value).ToString();
+            }
+
+            return null;
+        }
+
+        public static bool GetValueOrDefault(string key, string value, bool defaultValue)
+        {
+            string stringValue = GetValue(key, value);
+            if (stringValue == null)
+                return defaultValue;
+
+            return stringValue.ToLower().Equals("true");
+        }
+
+        public static int GetValueOrDefault(string key, string value, int defaultValue)
+        {
+            string stringValue = GetValue(key, value);
+            if (stringValue == null)
+                return defaultValue;
+
+            return Int32.Parse(stringValue);
         }
     }
 }

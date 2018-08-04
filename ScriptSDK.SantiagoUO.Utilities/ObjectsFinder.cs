@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ScriptSDK.SantiagoUO.Utilities
 {
-    public static class ObjetsFinder
+    public static class ObjectsFinder
     {
         private static readonly uint NO_CONTAINER = uint.MaxValue;
 
@@ -27,6 +27,14 @@ namespace ScriptSDK.SantiagoUO.Utilities
             StealthAPI.Stealth.Client.SetFindDistance(distance);
 
             return FindInContainer<T>(EasyUOHelper.ConvertToStealthType(easyUOObjectType), NO_CONTAINER);
+        }
+
+        public static List<T> FindInBackpack<T>(string[] easyUOObjectTypes) where T : UOEntity
+        {
+            List<Serial> containersSerials = new List<Serial>();
+            containersSerials.Add(PlayerMobile.GetPlayer().Backpack.Serial);
+
+            return FindInContainers<T>(easyUOObjectTypes, containersSerials);
         }
 
         public static List<T> FindInBackpackOrPaperdoll<T>(string[] easyUOObjectTypes) where T : UOEntity
