@@ -1,5 +1,6 @@
 ﻿using ScriptSDK.Attributes;
 using ScriptSDK.Engines;
+using ScriptSDK.Gumps;
 using ScriptSDK.Items;
 using ScriptSDK.Mobiles;
 using ScriptSDK.SantiagoUO.Utilities;
@@ -21,6 +22,7 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
         private readonly bool smelt1x1;
         private readonly int bankWeight;
         private readonly Container dropContainer;
+        private readonly int pickaxesCount;
 
         public RaillessMining()
         {
@@ -31,6 +33,7 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
             this.smelt1x1 = WindowsRegistry.GetValueOrDefault(@"Software\ScriptSDK.SantiagoUO\RaillessMining\" + playerMobile.Name, "Smelt1x1", false);
             this.bankWeight = WindowsRegistry.GetValueOrDefault(@"Software\ScriptSDK.SantiagoUO\RaillessMining\" + playerMobile.Name, "BankWeight", 100);
             this.dropContainer = new Container(EasyUOHelper.ConvertToStealthID(WindowsRegistry.GetValue(@"Software\ScriptSDK.SantiagoUO\RaillessMining\" + playerMobile.Name, "DropContainerId")));
+            this.pickaxesCount = WindowsRegistry.GetValueOrDefault(@"Software\ScriptSDK.SantiagoUO\RaillessMining\" + playerMobile.Name, "PickaxesCount", 2);
         }
 
         public void MineCave()
@@ -61,7 +64,7 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                     var pickaxe = ObjectsFinder.FindInBackpackOrPaperdoll<Item>(EasyUOItem.PICKAXES);
                     if (pickaxe.Count == 0)
                     {
-                        Drop();
+                        Bank();
 
                         continue;
                     }
@@ -73,7 +76,12 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                     }
 
                     if (playerMobile.Weight >= smeltWeight)
+                    {
                         Smelt(forges);
+
+                        if (playerMobile.Weight >= bankWeight)
+                            Bank();
+                    }
                 }
             }
         }
@@ -105,7 +113,7 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                 if (StealthAPI.Stealth.Client.InJournalBetweenTimes("That is too far", dateTime, DateTime.Now) >= 0)
                     return MineTileResult.DONE;
 
-                if (StealthAPI.Stealth.Client.InJournalBetweenTimes("You have no line", dateTime, DateTime.Now) >= 0)
+                if (StealthAPI.Stealth.Client.InJournalBetweenTimes("You have no line of sight to that location", dateTime, DateTime.Now) >= 0)
                     return MineTileResult.DONE;
 
                 if (StealthAPI.Stealth.Client.InJournalBetweenTimes("You cannot mine", dateTime, DateTime.Now) >= 0)
@@ -141,32 +149,31 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
 
                     oresStack.DoubleClick();
 
-                    Thread.Sleep(500);
+                    Thread.Sleep(250);
 
                     oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES);
                 }
             }
-
-            if (playerMobile.Weight >= bankWeight)
-                Drop();
         }
 
         private void SplitOres()
         {
             var oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES_STACKS);
+
             while (oresStacks.Count > 0)
             {
-                var oresStack = oresStacks[0];
+                foreach (var oresStack in oresStacks)
+                {
+                    oresStack.MoveItem(playerMobile.Backpack, 1, new Data.Point3D(100, 100, 0));
 
-                oresStack.MoveItem(playerMobile.Backpack, 1, new Data.Point3D(100, 100, 0));
-
-                Thread.Sleep(500);
+                    Thread.Sleep(500);
+                }
 
                 oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES_STACKS);
             }
         }
 
-        private void Drop()
+        private void Bank()
         {
             List<Data.Point3D> track = new List<Data.Point3D>();
             track.Add(new Data.Point3D(800, 1469, 0)); // Drop location
@@ -182,21 +189,37 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                 movingHelper.newMoveXY((ushort)track[x].X, (ushort)track[x].Y, true, 0, true);
             }
 
-            var oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES);
-            while (oresStacks.Count > 0)
-            {
-                var oresStack = oresStacks[0];
+            ContainersHelper.EmptyContainer(EasyUOItem.INGOTS, playerMobile.Backpack, dropContainer);
+            ContainersHelper.EmptyContainer(EasyUOItem.ORES, playerMobile.Backpack, dropContainer);
 
-                oresStack.MoveItem(dropContainer);
-
-                Thread.Sleep(500);
-
-                oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES);
-            }
+            RestockPickaxes();
 
             for (var x = 0; x < track.Count; x++)
             {
                 movingHelper.newMoveXY((ushort)track[x].X, (ushort)track[x].Y, true, 0, true);
+            }
+        }
+
+        private void RestockPickaxes()
+        {
+            var missingPickaxes = pickaxesCount - ObjectsFinder.FindInBackpackOrPaperdoll<Item>(EasyUOItem.PICKAXES).Count;
+
+            if (missingPickaxes > 0 && dropContainer.DoubleClick())
+            {
+                if (ContainersHelper.WaitForContainer(dropContainer, TimeSpan.FromSeconds(10)))
+                {
+                    var pickaxes = ObjectsFinder.FindInContainer<Item>(EasyUOItem.PICKAXES, dropContainer);
+
+                    foreach (var pickaxe in pickaxes)
+                    {
+                        pickaxe.MoveItem(playerMobile.Backpack);
+
+                        if (--missingPickaxes == 0)
+                            return;
+
+                        Thread.Sleep(500);
+                    }
+                }
             }
         }
 

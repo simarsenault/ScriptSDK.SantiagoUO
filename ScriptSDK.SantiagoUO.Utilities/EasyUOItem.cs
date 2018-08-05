@@ -9,6 +9,7 @@
         public static readonly string ORE = "TVJ";
         public static readonly string[] ORES_STACKS = new string[] { "DWJ", "EWJ", "GWJ" };
         public static readonly string[] ORES = new string[] { "DWJ", "EWJ", "GWJ", "TVJ" };
+        public static readonly string[] INGOTS = new string[] { "RMK", "NMK", "XMK", "TMK" };
 
         public static readonly string[] HATCHETS = new string[] { "ASF", "FSF" };
         public static readonly string[] PICKAXES = new string[] { "NPF", "QPF" };

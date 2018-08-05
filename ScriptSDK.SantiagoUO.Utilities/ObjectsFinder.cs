@@ -46,6 +46,14 @@ namespace ScriptSDK.SantiagoUO.Utilities
             return FindInContainers<T>(easyUOObjectTypes, containersSerials);
         }
 
+        public static List<T> FindInContainer<T>(string[] easyUOObjectTypes, Container container) where T : UOEntity
+        {
+            List<Serial> containersSerials = new List<Serial>();
+            containersSerials.Add(container.Serial);
+
+            return FindInContainers<T>(easyUOObjectTypes, containersSerials);
+        }
+
         public static List<T> FindInContainer<T>(string[] easyUOObjectTypes, Serial containerSerial) where T : UOEntity
         {
             List<Serial> containersSerials = new List<Serial>();
