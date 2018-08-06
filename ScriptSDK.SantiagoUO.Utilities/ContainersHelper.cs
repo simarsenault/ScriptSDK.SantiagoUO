@@ -1,4 +1,5 @@
-﻿using ScriptSDK.Gumps;
+﻿using ScriptSDK.Engines;
+using ScriptSDK.Gumps;
 using ScriptSDK.Items;
 using System;
 using System.Threading;
@@ -25,6 +26,8 @@ namespace ScriptSDK.SantiagoUO.Utilities
                 Thread.Sleep(250);
             }
 
+            ScriptLogger.WriteLine("[ERROR] Failed to open container '" + container.Serial.Value + "'");
+
             return false;
         }
 
@@ -42,7 +45,7 @@ namespace ScriptSDK.SantiagoUO.Utilities
             {
                 item.MoveItem(target);
 
-                Thread.Sleep(500);
+                Thread.Sleep(1000);
             }
         }
     }

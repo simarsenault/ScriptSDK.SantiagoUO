@@ -11,6 +11,7 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
             SkillGainTracker skillGainTracker = new SkillGainTracker(Skill.Mining, new DiscordSkillChangeEventHandler());
             skillGainTracker.Start();
 
+            ScriptLogger.LogToStealth = true;
             TileReader.Initialize();
 
             new RaillessMining().MineCave();

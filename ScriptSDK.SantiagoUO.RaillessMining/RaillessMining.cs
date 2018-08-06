@@ -38,12 +38,12 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
 
         public void MineCave()
         {
-            var tiles = UltimaTileReader.GetMineSpots(this.playerMobile.Location.X, this.playerMobile.Location.Y);
+            var tiles = UltimaTileReader.GetMineSpots(playerMobile.Location.X, playerMobile.Location.Y);
             var forges = ObjectsFinder.Find<Item>(EasyUOItem.FORGE, 18);
 
             while (tiles.Count > 0)
             {
-                Data.Point3D playerLocation = this.playerMobile.Location;
+                Data.Point3D playerLocation = playerMobile.Location;
                 var nearestMineableTile = tiles.FindAll(tile => Math.Sqrt(Math.Pow((tile.X - playerLocation.X), 2) + Math.Pow((tile.Y - playerLocation.Y), 2)) != 0).OrderBy(tile => Math.Sqrt(Math.Pow((tile.X - playerLocation.X), 2) + Math.Pow((tile.Y - playerLocation.Y), 2))).First();
 
                 movingHelper.newMoveXY(nearestMineableTile.X, nearestMineableTile.Y, true, 0, true);
@@ -64,7 +64,7 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                     var pickaxe = ObjectsFinder.FindInBackpackOrPaperdoll<Item>(EasyUOItem.PICKAXES);
                     if (pickaxe.Count == 0)
                     {
-                        Bank();
+                        Bank(new Data.Point2D(playerMobile.Location.X, playerMobile.Location.Y));
 
                         continue;
                     }
@@ -80,7 +80,7 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                         Smelt(forges);
 
                         if (playerMobile.Weight >= bankWeight)
-                            Bank();
+                            Bank(new Data.Point2D(playerMobile.Location.X, playerMobile.Location.Y));
                     }
                 }
             }
@@ -142,16 +142,32 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                 if (smelt1x1)
                     SplitOres();
 
-                var oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES);
+                ObjectsFinder.ClearIgnoreList("smelt");
+                
+                var oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES, "smelt");
                 while (oresStacks.Count > 0)
                 {
                     var oresStack = oresStacks[0];
 
+                    var beforeSmeltDateTime = DateTime.Now;
+                    var smeltTimeout = beforeSmeltDateTime.Add(TimeSpan.FromSeconds(10));
+
                     oresStack.DoubleClick();
 
-                    Thread.Sleep(250);
+                    while (DateTime.Now < smeltTimeout)
+                    {
+                        if (StealthAPI.Stealth.Client.InJournalBetweenTimes("mining to smelt that ore", beforeSmeltDateTime, DateTime.Now) >= 0)
+                        {
+                            ObjectsFinder.AddToIgnoreList("smelt", oresStack.Serial);
 
-                    oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES);
+                            break;
+                        }
+
+                        if (!oresStack.Valid)
+                            break;
+                    }
+
+                    oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES, "smelt");
                 }
             }
         }
@@ -166,59 +182,41 @@ namespace ScriptSDK.SantiagoUO.RaillessMining
                 {
                     oresStack.MoveItem(playerMobile.Backpack, 1, new Data.Point3D(100, 100, 0));
 
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                 }
 
                 oresStacks = ObjectsFinder.FindInBackpack<Item>(EasyUOItem.ORES_STACKS);
             }
         }
 
-        private void Bank()
+        private void Bank(Data.Point2D returnLocation)
         {
-            List<Data.Point3D> track = new List<Data.Point3D>();
-            track.Add(new Data.Point3D(800, 1469, 0)); // Drop location
-            track.Add(new Data.Point3D(807, 1469, 0));
-            track.Add(new Data.Point3D(857, 1425, 0));
-            track.Add(new Data.Point3D(882, 1480, 0));
-            track.Add(new Data.Point3D(909, 1543, 0));
-            track.Add(new Data.Point3D(995, 1622, 0));
-            track.Add(new Data.Point3D(997, 1602, 0)); // Mine 
-
-            for (var x = track.Count - 1; x >= 0; x--)
-            {
-                movingHelper.newMoveXY((ushort)track[x].X, (ushort)track[x].Y, true, 0, true);
-            }
+            movingHelper.newMoveXY(800, 1469, true, 0, true);
 
             ContainersHelper.EmptyContainer(EasyUOItem.INGOTS, playerMobile.Backpack, dropContainer);
             ContainersHelper.EmptyContainer(EasyUOItem.ORES, playerMobile.Backpack, dropContainer);
 
             RestockPickaxes();
 
-            for (var x = 0; x < track.Count; x++)
-            {
-                movingHelper.newMoveXY((ushort)track[x].X, (ushort)track[x].Y, true, 0, true);
-            }
+            movingHelper.newMoveXY((ushort)returnLocation.X, (ushort)returnLocation.Y, true, 0, true); 
         }
 
         private void RestockPickaxes()
         {
             var missingPickaxes = pickaxesCount - ObjectsFinder.FindInBackpackOrPaperdoll<Item>(EasyUOItem.PICKAXES).Count;
 
-            if (missingPickaxes > 0 && dropContainer.DoubleClick())
+            if (missingPickaxes > 0)
             {
-                if (ContainersHelper.WaitForContainer(dropContainer, TimeSpan.FromSeconds(10)))
+                var pickaxes = ObjectsFinder.FindInContainer<Item>(EasyUOItem.PICKAXES, dropContainer);
+
+                foreach (var pickaxe in pickaxes)
                 {
-                    var pickaxes = ObjectsFinder.FindInContainer<Item>(EasyUOItem.PICKAXES, dropContainer);
+                    pickaxe.Grab();
 
-                    foreach (var pickaxe in pickaxes)
-                    {
-                        pickaxe.MoveItem(playerMobile.Backpack);
+                    if (--missingPickaxes == 0)
+                        return;
 
-                        if (--missingPickaxes == 0)
-                            return;
-
-                        Thread.Sleep(500);
-                    }
+                    Thread.Sleep(1000);
                 }
             }
         }
